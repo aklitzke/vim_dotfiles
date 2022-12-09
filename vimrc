@@ -692,3 +692,19 @@ endif
 if filereadable(expand('~/.vimrc_local'))
   source ~/.vimrc_local
 end
+
+"no .swp files hanging around, no conflicts
+set noswapfile
+
+"automatically reload files when they change
+Plug 'djoshea/vim-autoread'
+set autoread
+
+"rust syntax highlighting
+Plug 'rust-lang/rust.vim'
+
+"toml
+Plug 'cespare/vim-toml'
+
+"format upon save
+let g:rustfmt_autosave = 1
