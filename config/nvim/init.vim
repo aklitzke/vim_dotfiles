@@ -196,7 +196,7 @@ if has('nvim-0.5')
   function notify_file_changed(buffer, change)
     local log = require('vim.lsp.log')
     local filepath = vim.fn.expand('#'..buffer..':p')
-    for _,client in pairs(vim.lsp.get_active_clients()) do
+    for _,client in pairs(vim.lsp.get_clients()) do
       log.info('Notifying LSP server "'..client.name..'" of change to file "'..filepath..'"')
       local result = client.notify('workspace/didChangeWatchedFiles', {
         changes = {{ uri = 'file://'..filepath, type = change }},
