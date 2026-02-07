@@ -498,6 +498,7 @@ xnoremap <expr> p 'pgv"'.v:register.'y'
 " ========= Insert Shortcuts ========
 
 imap <C-L> <SPACE>=><SPACE>
+inoremap jk <Esc>
 
 " ========= Functions ========
 
