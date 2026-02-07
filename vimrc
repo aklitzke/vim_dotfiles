@@ -48,6 +48,7 @@ set mouse=
 if !has('nvim')
   set ttymouse=
 endif
+set clipboard=unnamedplus " Use system clipboard for yank/paste
 set backupcopy=yes " Setting backup copy preserves file inodes, which are needed for Docker file mounting
 if v:version > 704 || v:version == 704 && has('patch2201') " signcolumn wasn't added until vim 7.4.2201
   set signcolumn=yes
