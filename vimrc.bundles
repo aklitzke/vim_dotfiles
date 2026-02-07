@@ -12,7 +12,7 @@ Plug 'akhaku/vim-java-unused-imports'
 Plug 'aklt/plantuml-syntax'
 Plug 'arthurxavierx/vim-caser'
 " Show git diff via Vim sign column.
-Plug 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter', {'branch': 'main'}
 Plug 'google/vim-maktaba'
 Plug 'google/vim-glaive'
 Plug 'google/vim-codefmt'
@@ -26,7 +26,7 @@ Plug 'derekwyatt/vim-scala'
 Plug 'ekalinin/Dockerfile.vim'
 Plug 'elixir-lang/vim-elixir'
 Plug 'elubow/cql-vim'
-Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'commit': '8c4db1c61432511a3aa55971dabb2171cbcba7b1', 'do': ':GoInstallBinaries' }
 Plug 'Glench/Vim-Jinja2-Syntax'
 Plug 'godlygeek/tabular'
 Plug 'tpope/vim-markdown'
@@ -87,7 +87,7 @@ Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-vinegar'
 Plug 'tpope/vim-abolish'
 Plug 'uarun/vim-protobuf'
-Plug 'vim-ruby/vim-ruby', { 'commit': '84565856e6965144e1c34105e03a7a7e87401acb' }
+Plug 'vim-ruby/vim-ruby'
 Plug 'vim-scripts/Align'
 Plug 'vim-scripts/VimClojure'
 Plug 'vim-scripts/groovyindent-unix'
@@ -102,6 +102,10 @@ Plug 'wellle/targets.vim'
 Plug 'romainl/vim-qf'
 Plug 'wellle/tmux-complete.vim'
 Plug 'samguyjones/vim-crosspaste'
+Plug 'nathanaelkane/vim-indent-guides'
+
+Plug 'github/copilot.vim', { 'branch': 'release' }
+Plug 'DanBradbury/copilot-chat.vim', {'branch': 'main'}
 
 if v:version >= 800 || has('nvim')
   Plug 'w0rp/ale'
