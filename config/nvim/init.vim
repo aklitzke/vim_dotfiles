@@ -4,8 +4,15 @@
 
 if has('nvim-0.5')
   lua << EOF
-  local status, nvim_lsp = pcall(require, 'lspconfig')
-  if status then
+  if vim.fn.has('nvim-0.11') == 1 then
+    -- Use new vim.lsp.config API for Neovim 0.11+
+    local lsp_config_available = true
+  else
+    -- Use legacy lspconfig for older versions
+    local status, nvim_lsp = pcall(require, 'lspconfig')
+    local lsp_config_available = status
+  end
+  if lsp_config_available then
     -- Run an LSP command using a Telescope picker if it's available, otherwise use the fallback.
     function lsp_do(picker, fallback)
       if picker == "lsp_code_actions" then
@@ -93,21 +100,59 @@ if has('nvim-0.5')
 
     local jdtls_bundles = {vim.env.HOME.."/language-servers/java/extensions/debug.jar"};
     vim.list_extend(jdtls_bundles, vim.split(vim.fn.glob(vim.env.HOME.."/language-servers/java/extensions/test/extension/server/*.jar"), "\n"))
-    nvim_lsp.jdtls.setup{
-      cmd = { "java-language-server", "--heap-max", "8G" };
-      init_options = {
-        bundles = jdtls_bundles;
-      };
-      on_attach = on_attach;
-    }
 
-    nvim_lsp.gopls.setup{
-      on_attach = on_attach;
-    }
+    if vim.fn.has('nvim-0.11') == 1 then
+      -- New API for Neovim 0.11+
+      vim.lsp.config.jdtls = {
+        cmd = { "java-language-server", "--heap-max", "8G" },
+        filetypes = { "java" },
+        root_dir = vim.fs.root(0, {'.git', 'mvnw', 'gradlew'}),
+        init_options = {
+          bundles = jdtls_bundles,
+        },
+      }
+      vim.lsp.enable('jdtls')
 
-    nvim_lsp.bashls.setup{
-      on_attach = on_attach;
-    }
+      vim.lsp.config.gopls = {
+        cmd = { "gopls" },
+        filetypes = { "go", "gomod", "gowork", "gotmpl" },
+        root_dir = vim.fs.root(0, {'go.mod', '.git'}),
+      }
+      vim.lsp.enable('gopls')
+
+      vim.lsp.config.bashls = {
+        cmd = { "bash-language-server", "start" },
+        filetypes = { "sh" },
+        root_dir = vim.fs.root(0, {'.git'}),
+      }
+      vim.lsp.enable('bashls')
+
+      -- Set up on_attach for all LSP buffers
+      vim.api.nvim_create_autocmd('LspAttach', {
+        callback = function(args)
+          local bufnr = args.buf
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          on_attach(client, bufnr)
+        end,
+      })
+    else
+      -- Legacy API for older versions
+      nvim_lsp.jdtls.setup{
+        cmd = { "java-language-server", "--heap-max", "8G" };
+        init_options = {
+          bundles = jdtls_bundles;
+        };
+        on_attach = on_attach;
+      }
+
+      nvim_lsp.gopls.setup{
+        on_attach = on_attach;
+      }
+
+      nvim_lsp.bashls.setup{
+        on_attach = on_attach;
+      }
+    end
   end
 
   local status, telescope = pcall(require, 'telescope')
