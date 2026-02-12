@@ -207,7 +207,7 @@ let g:puppet_align_hashes = 0
 let $FZF_DEFAULT_COMMAND = 'find . -name "*" -type f 2>/dev/null
                             \ | grep -v -E "tmp\/|.gitmodules|.git\/|deps\/|_build\/|node_modules\/|vendor\/"
                             \ | sed "s|^\./||"'
-let $FZF_DEFAULT_OPTS = '--reverse -i'
+let $FZF_DEFAULT_OPTS = '--reverse -i --bind ctrl-d:half-page-down,ctrl-u:half-page-up'
 let g:fzf_tags_command = 'ctags -R --exclude=".git\|.svn\|log\|tmp\|db\|pkg" --extra=+f --langmap=Lisp:+.clj'
 let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
@@ -426,7 +426,8 @@ endfunction
 
 command! -nargs=* SmartFuzzy :call SmartFuzzy()
 map <silent> <leader>ff :SmartFuzzy<CR>
-map <silent> <leader>fg :GFiles<CR>
+map <silent> <leader>fg :Rg<CR>
+map <silent> <leader>fw :Rg <C-R><C-W><CR>
 map <silent> <leader>fb :Buffers<CR>
 map <silent> <leader>ft :Tags<CR>
 map <silent> <leader>fm :Maps<CR>
@@ -484,6 +485,9 @@ nnoremap <silent> Y y$
 map <silent> <LocalLeader>ws /\s\+$<CR>
 
 map <silent> <LocalLeader>pp :set paste!<CR>
+
+" Toggle word wrap
+map <silent> <LocalLeader>tw :set wrap!<CR>
 
 " vim-crosspaste map
 map <silent> <LocalLeader>qp :call CrossPaste()<CR>
