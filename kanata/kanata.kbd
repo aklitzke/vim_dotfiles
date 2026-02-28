@@ -12,8 +12,10 @@
 ;; ║            j+k simultaneously → Esc                                      ║
 ;; ║                                                                           ║
 ;; ║  [L-Cmd]  [R-Cmd]          [Space]                                       ║
-;; ║  tap:Cmd   Bspc            (space)                                       ║
+;; ║  tap:Tab   Bspc            (space)                                       ║
 ;; ║  hld:NUM                                                                  ║
+;; ║                                                                           ║
+;; ║  [Tab] disabled — use L-Cmd tap instead.                                 ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 ;;
 ;; ╔══════════════════════════ NUMPAD LAYER (hold L-Cmd) ══════════════════════╗
@@ -33,7 +35,8 @@
 ;;
 ;; ╔═══════════════════════════════ HARD MODE ══════════════════════════════════╗
 ;; ║  Double-tap fn (far left) to toggle on/off.                              ║
-;; ║  Blocks: Backspace, Shift, Ctrl, Cmd (physical keys only).               ║
+;; ║  Blocks: Backspace, Shift, Ctrl, Cmd, Caps Lock, number row (1-0).       ║
+;; ║  Symbols (shift+number) still work via home row shift (d or k).          ║
 ;; ║  Forces use of home row mods. Numpad layer still works.                  ║
 ;; ║                                                                           ║
 ;; ║  NOTE: if fn isn't interceptable on your keyboard, change @fn-on /       ║
@@ -59,7 +62,8 @@
         u    i    o
         m    ,    .
   lmet  rmet      spc
-  fn    lsft rsft lctl bspc
+  fn    lsft rsft lctl bspc tab
+  1    2    3    4    5    6    7    8    9    0
 )
 
 (defalias
@@ -82,10 +86,21 @@
   l   (tap-hold 200 200 l ralt)
   sem (tap-hold 200 200 ; rctl)
 
-  ;; left-cmd: tap=Cmd, hold=numpad layer
-  lm      (tap-hold 200 200 lmet (layer-while-held numpad))
-  ;; left-cmd in hard mode: tap blocked, hold=numpad still works
-  lm-hard (tap-hold 200 200 XX (layer-while-held numpad))
+  ;; left-cmd: tap=Tab, hold=numpad layer
+  lm      (tap-hold 200 200 tab (layer-while-held numpad))
+  lm-hard (tap-hold 200 200 tab (layer-while-held numpad))
+
+  ;; hard mode number row: blocked bare, symbols (shift+number) still work
+  n1-hm (fork XX 1 (lsft rsft))
+  n2-hm (fork XX 2 (lsft rsft))
+  n3-hm (fork XX 3 (lsft rsft))
+  n4-hm (fork XX 4 (lsft rsft))
+  n5-hm (fork XX 5 (lsft rsft))
+  n6-hm (fork XX 6 (lsft rsft))
+  n7-hm (fork XX 7 (lsft rsft))
+  n8-hm (fork XX 8 (lsft rsft))
+  n9-hm (fork XX 9 (lsft rsft))
+  n0-hm (fork XX 0 (lsft rsft))
 
   ;; fn double-tap toggles hard mode on/off (single tap passes fn through)
   fn-on  (tap-dance 300 (fn (layer-switch hardmode)))
@@ -104,15 +119,17 @@
         u    i    o
         m    ,    .
   @lm   bspc      spc
-  @fn-on lsft rsft lctl bspc
+  @fn-on lsft rsft lctl bspc XX
+  1    2    3    4    5    6    7    8    9    0
 )
 
 (deflayer hardmode
-  @cap  @a   @s   @d   @f   g    h    @j   @k   @l   @sem
+  XX    @a   @s   @d   @f   g    h    @j   @k   @l   @sem
         u    i    o
         m    ,    .
   @lm-hard bspc     spc
-  @fn-off  XX   XX  XX  XX
+  @fn-off  XX   XX  XX  XX  XX
+  @n1-hm @n2-hm @n3-hm @n4-hm @n5-hm @n6-hm @n7-hm @n8-hm @n9-hm @n0-hm
 )
 
 (deflayer numpad
@@ -120,5 +137,6 @@
         kp7  kp8  kp9
         kp1  kp2  kp3
   _     _         kp0
-  _     _    _    _    _
+  _     _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _
 )
