@@ -11,9 +11,10 @@
 ;; ║            Cmd     Shift   Opt     Ctrl                                  ║
 ;; ║            j+k simultaneously → Esc                                      ║
 ;; ║                                                                           ║
-;; ║  [L-Cmd]  [R-Cmd]          [Space]                                       ║
-;; ║  tap:Tab   Bspc            (space)                                       ║
+;; ║  [L-Cmd]      [R-Cmd]       [Space]                                       ║
+;; ║  tap:Tab       Bspc        (space)                                       ║
 ;; ║  hld:NUM                                                                  ║
+;; ║  tap-then-hld:NAV                                                        ║
 ;; ║                                                                           ║
 ;; ║  [Tab] disabled — use L-Cmd tap instead.                                 ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -33,6 +34,13 @@
 ;; ║                           0                                              ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 ;;
+;; ╔═════════════════════════ NAV LAYER (tap-then-hold L-Cmd) ══════════════════╗
+;; ║  Tap L-Cmd once, then immediately press and hold L-Cmd again.            ║
+;; ║                                                                           ║
+;; ║  [ h  ]  [ j  ]  [ k  ]  [ l  ]                                         ║
+;; ║   ←        ↓       ↑       →                                             ║
+;; ╚═══════════════════════════════════════════════════════════════════════════╝
+;;
 ;; ╔═══════════════════════════════ HARD MODE ══════════════════════════════════╗
 ;; ║  Double-tap fn (far left) to toggle on/off.                              ║
 ;; ║  Blocks: Backspace, Shift, Ctrl, Cmd, Caps Lock, number row (1-0).       ║
@@ -43,9 +51,9 @@
 ;; ║  @fn-off in defalias and swap 'fn' in defsrc to another key.             ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 ;;
-;; TIMING: hold threshold is 200ms. tap-hold (not tap-hold-release) is used so
-;; modifiers only fire after the full hold time — rolling keypresses while
-;; typing fast will never accidentally trigger a modifier.
+;; TIMING: home row mods use tap-hold at 175ms with concurrent-tap-hold enabled.
+;; Modifiers only fire after the full 175ms — rolling keypresses during fast
+;; typing never accidentally trigger a modifier.
 
 (defcfg
   process-unmapped-keys yes
@@ -71,24 +79,25 @@
   cap (tap-hold 200 200 esc lctl)
 
   ;; Home row mods — left hand (GACS)
-  a   (tap-hold 200 200 a lctl)
-  s   (tap-hold 200 200 s lalt)
-  d   (tap-hold 200 200 d lsft)
-  f   (tap-hold 200 200 f lmet)
+  a   (tap-hold 175 175 a lctl)
+  s   (tap-hold 175 175 s lalt)
+  d   (tap-hold 175 175 d lsft)
+  f   (tap-hold 175 175 f lmet)
 
   ;; Home row mods — right hand (mirrored GACS)
   ;; j and k are wrapped in a chord group below (jk → Esc)
-  j-hrm (tap-hold 200 200 j rmet)
-  k-hrm (tap-hold 200 200 k rsft)
+  j-hrm (tap-hold 175 175 j rmet)
+  k-hrm (tap-hold 175 175 k rsft)
   j     (chord jk j)
   k     (chord jk k)
 
-  l   (tap-hold 200 200 l ralt)
-  sem (tap-hold 200 200 ; rctl)
+  l   (tap-hold 175 175 l ralt)
+  sem (tap-hold 175 175 ; rctl)
 
-  ;; left-cmd: tap=Tab, hold=numpad layer
-  lm      (tap-hold 200 200 tab (layer-while-held numpad))
-  lm-hard (tap-hold 200 200 tab (layer-while-held numpad))
+  ;; left-cmd: tap=Tab, hold=numpad, tap-then-hold=nav
+  lm (tap-dance 300
+    ((tap-hold 200 200 tab (layer-while-held numpad))
+     (layer-while-held nav)))
 
   ;; hard mode number row: blocked bare, symbols (shift+number) still work
   n1-hm (fork XX 1 (lsft rsft))
@@ -127,9 +136,18 @@
   XX    @a   @s   @d   @f   g    h    @j   @k   @l   @sem
         u    i    o
         m    ,    .
-  @lm-hard bspc     spc
+  @lm      bspc     spc
   @fn-off  XX   XX  XX  XX  XX
   @n1-hm @n2-hm @n3-hm @n4-hm @n5-hm @n6-hm @n7-hm @n8-hm @n9-hm @n0-hm
+)
+
+(deflayer nav
+  _     _    _    _    _    _    left down up   right _
+        _    _    _
+        _    _    _
+  _     _         _
+  _     _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _
 )
 
 (deflayer numpad
