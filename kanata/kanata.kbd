@@ -1,0 +1,124 @@
+;; kanata.kbd — cross-platform keyboard config (macOS + Linux)
+;;
+;; ╔═══════════════════════════════ BASE LAYER ════════════════════════════════╗
+;; ║  Tap = letter/key as normal.  Hold = modifier shown below.               ║
+;; ║                                                                           ║
+;; ║  [CAPS ]  [ a  ]  [ s  ]  [ d  ]  [ f  ]  [ g  ]  [ h  ]               ║
+;; ║  tap:Esc  Ctrl    Opt     Shift   Cmd     (g)     (h)                    ║
+;; ║  hld:Ctl                                                                  ║
+;; ║                                                                           ║
+;; ║            [ j  ]  [ k  ]  [ l  ]  [ ;  ]                               ║
+;; ║            Cmd     Shift   Opt     Ctrl                                  ║
+;; ║            j+k simultaneously → Esc                                      ║
+;; ║                                                                           ║
+;; ║  [L-Cmd]  [R-Cmd]          [Space]                                       ║
+;; ║  tap:Cmd   Bspc            (space)                                       ║
+;; ║  hld:NUM                                                                  ║
+;; ╚═══════════════════════════════════════════════════════════════════════════╝
+;;
+;; ╔══════════════════════════ NUMPAD LAYER (hold L-Cmd) ══════════════════════╗
+;; ║                                                                           ║
+;; ║  [ u  ]  [ i  ]  [ o  ]                                                  ║
+;; ║    7       8       9                                                      ║
+;; ║                                                                           ║
+;; ║  [ j  ]  [ k  ]  [ l  ]                                                  ║
+;; ║    4       5       6                                                      ║
+;; ║                                                                           ║
+;; ║  [ m  ]  [ ,  ]  [ .  ]                                                  ║
+;; ║    1       2       3                                                      ║
+;; ║                                                                           ║
+;; ║                    [    Space    ]                                        ║
+;; ║                           0                                              ║
+;; ╚═══════════════════════════════════════════════════════════════════════════╝
+;;
+;; ╔═══════════════════════════════ HARD MODE ══════════════════════════════════╗
+;; ║  Double-tap fn (far left) to toggle on/off.                              ║
+;; ║  Blocks: Backspace, Shift, Ctrl, Cmd (physical keys only).               ║
+;; ║  Forces use of home row mods. Numpad layer still works.                  ║
+;; ║                                                                           ║
+;; ║  NOTE: if fn isn't interceptable on your keyboard, change @fn-on /       ║
+;; ║  @fn-off in defalias and swap 'fn' in defsrc to another key.             ║
+;; ╚═══════════════════════════════════════════════════════════════════════════╝
+;;
+;; TIMING: hold threshold is 200ms. tap-hold (not tap-hold-release) is used so
+;; modifiers only fire after the full hold time — rolling keypresses while
+;; typing fast will never accidentally trigger a modifier.
+
+(defcfg
+  process-unmapped-keys yes
+  concurrent-tap-hold   yes
+  ;; macOS: restrict to a specific keyboard if needed, e.g.:
+  ;; macos-dev-names-include ("Apple Internal Keyboard / Trackpad")
+  ;;
+  ;; Linux: set to your keyboard device path, e.g.:
+  ;; linux-dev /dev/input/by-id/your-keyboard-here
+)
+
+(defsrc
+  caps  a    s    d    f    g    h    j    k    l    ;
+        u    i    o
+        m    ,    .
+  lmet  rmet      spc
+  fn    lsft rsft lctl bspc
+)
+
+(defalias
+  ;; caps_lock: tap=Escape, hold=Ctrl
+  cap (tap-hold 200 200 esc lctl)
+
+  ;; Home row mods — left hand (GACS)
+  a   (tap-hold 200 200 a lctl)
+  s   (tap-hold 200 200 s lalt)
+  d   (tap-hold 200 200 d lsft)
+  f   (tap-hold 200 200 f lmet)
+
+  ;; Home row mods — right hand (mirrored GACS)
+  ;; j and k are wrapped in a chord group below (jk → Esc)
+  j-hrm (tap-hold 200 200 j rmet)
+  k-hrm (tap-hold 200 200 k rsft)
+  j     (chord jk j)
+  k     (chord jk k)
+
+  l   (tap-hold 200 200 l ralt)
+  sem (tap-hold 200 200 ; rctl)
+
+  ;; left-cmd: tap=Cmd, hold=numpad layer
+  lm      (tap-hold 200 200 lmet (layer-while-held numpad))
+  ;; left-cmd in hard mode: tap blocked, hold=numpad still works
+  lm-hard (tap-hold 200 200 XX (layer-while-held numpad))
+
+  ;; fn double-tap toggles hard mode on/off (single tap passes fn through)
+  fn-on  (tap-dance 300 (fn (layer-switch hardmode)))
+  fn-off (tap-dance 300 (fn (layer-switch base)))
+)
+
+;; j+k simultaneously → Escape; solo j/k fall through to their home row mods
+(defchords jk 50
+  (j)   @j-hrm
+  (k)   @k-hrm
+  (j k) esc
+)
+
+(deflayer base
+  @cap  @a   @s   @d   @f   g    h    @j   @k   @l   @sem
+        u    i    o
+        m    ,    .
+  @lm   bspc      spc
+  @fn-on lsft rsft lctl bspc
+)
+
+(deflayer hardmode
+  @cap  @a   @s   @d   @f   g    h    @j   @k   @l   @sem
+        u    i    o
+        m    ,    .
+  @lm-hard bspc     spc
+  @fn-off  XX   XX  XX  XX
+)
+
+(deflayer numpad
+  _     _    _    _    _    _    _    kp4  kp5  kp6  _
+        kp7  kp8  kp9
+        kp1  kp2  kp3
+  _     _         kp0
+  _     _    _    _    _
+)
