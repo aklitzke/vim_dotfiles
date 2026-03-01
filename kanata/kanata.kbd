@@ -172,7 +172,7 @@
   _    tab  @sw-w @tb-p @tb-n volu @cm-l @sp-b @sp-f @cm-r del  _    _    _
   XX   @tmux-l @ns-c @ns-a @ns-m vold left down up right bspc _    _
   _    @ct-n XX @sp-b @sp-f pp   @ds-p pgdn  pgup @ds-n ret  _
-  _    _    _    _              @n-sr          @n-sr _
+  _    _    _    _              @n-sr          bspc _
                                 _    _    _    _
 )
 
