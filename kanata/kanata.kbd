@@ -8,25 +8,23 @@
 ;; ║                                                                         ║
 ;; ║  normal       All keys passthrough (default startup)                    ║
 ;; ║  callum       Base QWERTY — non-layout keys blocked                    ║
-;; ║  sym-access   Transparent overlay — space becomes SYM activator        ║
 ;; ║  callum-sym   Symbols (Callum's SYM)                                   ║
 ;; ║  callum-nav   Navigation (Callum's NAV, macOS shortcuts)               ║
-;; ║  num-access   Transparent overlay from NAV — space becomes NUM         ║
 ;; ║  callum-num   Numbers & F-keys (Callum's NUM)                          ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 ;;
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
 ;; ║  THUMB KEYS (callum mode)                                               ║
 ;; ║                                                                         ║
-;; ║  caps   SYM access  (caps↓ → spc↓ → caps↑ → SYM while spc held)      ║
+;; ║  lsft   Shift                                                           ║
 ;; ║  lmet   NAV (hold)                                                      ║
 ;; ║  space  Space                                                           ║
-;; ║  rmet   Shift                                                           ║
+;; ║  rmet   SYM (hold)                                                      ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 ;;
 ;; NUM access (SYM + NAV):
 ;;   From SYM → hold lmet
-;;   From NAV → caps→space roll
+;;   From NAV → hold rmet or space
 
 (defcfg
   process-unmapped-keys yes
@@ -96,25 +94,18 @@
   cm-r (multi lmet right)           ;; ⌘→  line end
   sp-b (multi lmet lbrc)            ;; ⌘[  back
   sp-f (multi lmet rbrc)            ;; ⌘]  forward
-  ds-p (multi lalt lmet left)       ;; ⌥⌘← prev desktop
-  ds-n (multi lalt lmet right)      ;; ⌥⌘→ next desktop
-  ct-s (multi lctl spc)             ;; ⌃Space
+  ds-p (multi lctl left)            ;; ⌥⌘← prev desktop
+  ds-n (multi lctl right)           ;; ⌥⌘→ next desktop
+  ct-n (multi lctl ret)             ;; ⌃Enter
+  tmux-l (multi lctl a)             ;; tmux leader
 
   ;; ── Layer access ───────────────────────────────────────────────
   ;; Callum base thumb keys
-  sym  (layer-while-held sym-access)     ;; caps → sym-access overlay
-  nav  (layer-while-held callum-nav)     ;; lmet → NAV (persistent while held)
+  sym  (layer-while-held callum-sym)     ;; rmet → SYM (hold)
+  nav  (layer-while-held callum-nav)     ;; lmet → NAV (hold)
 
-  ;; SYM activation: space on sym-access → callum-sym
-  s-sp (layer-while-held callum-sym)
-
-  ;; NUM from SYM: lmet on SYM → callum-num
+  ;; NUM from either SYM or NAV: hold the other thumb key
   n-sr (layer-while-held callum-num)
-
-  ;; NUM from NAV: caps on NAV → num-access overlay
-  n-ac (layer-while-held num-access)
-  ;; space on num-access → callum-num
-  n-sp (layer-while-held callum-num)
 
   ;; ── fn toggle ──────────────────────────────────────────────────
   fn-n (tap-dance 300 (fn  (layer-switch callum)))  ;; normal: tap=fn, dtap→callum
@@ -145,23 +136,10 @@
   XX   brdn brup _    _    _    _    prev pp   next mute vold volu
   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX
   XX   q    w    e    r    t    y    u    i    o    p    XX   XX   XX
-  @sym a    s    d    f    g    h    j    k    l    '    XX   XX
-  XX   z    x    c    v    b    n    m    ,    .    /    XX
-  @fn-c XX  XX   @nav           spc            lsft XX
+  XX   a    s    d    f    g    h    j    k    l    '    XX   XX
+  lsft z    x    c    v    b    n    m    ,    .    /    XX
+  @fn-c XX  XX   @nav           spc            @sym XX
                                 XX   XX   XX   XX
-)
-
-;; ╔═══════════════════════════════════════════════════════════════════════════╗
-;; ║  SYM-ACCESS — transparent overlay; only space changes (→ SYM activator)║
-;; ╚═══════════════════════════════════════════════════════════════════════════╝
-(deflayer sym-access
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _              @s-sp          _    _
-                                _    _    _    _
 )
 
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -191,10 +169,10 @@
 (deflayer callum-nav
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    tab  @sw-w @tb-p @tb-n volu  XX   @cm-l up   @cm-r del  _    _    _
-  @n-ac @os-s @ns-c @ns-a @ns-m vold left down up right bspc _    _
-  _    @ds-p @ds-n @sp-b @sp-f pp   spc  pgdn  pgup @ct-s ret  _
-  _    _    _    _              @n-sr          _    _
+  _    tab  @sw-w @tb-p @tb-n volu @cm-l @sp-b @sp-f @cm-r del  _    _    _
+  XX   @tmux-l @ns-c @ns-a @ns-m vold left down up right bspc _    _
+  _    @ct-n XX @sp-b @sp-f pp   @ds-p pgdn  pgup @ds-n ret  _
+  _    _    _    _              @n-sr          @n-sr _
                                 _    _    _    _
 )
 
@@ -215,26 +193,13 @@
 )
 
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
-;; ║  NUM-ACCESS — transparent overlay from NAV; space activates NUM        ║
-;; ╚═══════════════════════════════════════════════════════════════════════════╝
-(deflayer num-access
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _              @n-sp          _    _
-                                _    _    _    _
-)
-
-;; ╔═══════════════════════════════════════════════════════════════════════════╗
 ;; ║  CALLUM-NUM — numbers & F-keys (Callum's NUM layer)                    ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 (deflayer callum-num
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    f1   f2   f3   f4   f5   f6   7    8    9    -    _    _    _
-  _    @os-s @os-c @os-a @os-m f7 f8 4    5    6    +    _    _
+  _    f1   f2   f3   f4   f5   f6   7    8    9    del  _    _    _
+  _    @os-s @os-c @os-a @os-m f7 f8 4    5    6    bspc _    _
   _    f9   f10  f11  f12  _    0    1    2    3    .    _
   _    _    _    _              _              _    _
                                 _    _    _    _
