@@ -155,7 +155,7 @@
   _    esc  lbrc @lcrl @lprn @tild @cart @rprn @rcrl rbrc grv _    _    _
   _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @colo _   _
   _    @plus @pipe @at /   @pct spc  ;    @amp @ques @excl _
-  _    _    _    @n-sr          _              _    _
+  _    _    _    @n-sr          @n-sr           _    _
                                 _    _    _    _
 )
 
@@ -200,7 +200,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    f1   f2   f3   f4   f5   f6   7    8    9    del  _    _    _
   _    @os-s @os-c @os-a @os-m f7 f8 4    5    6    bspc _    _
-  _    f9   f10  f11  f12  _    0    1    2    3    .    _
+  _    f9   f10  f11  f12  spc  0    1    2    3    .    _
   _    _    _    _              _              _    _
                                 _    _    _    _
 )
