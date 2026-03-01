@@ -46,6 +46,12 @@
                                 left down up   right
 )
 
+(defvirtualkeys
+  vc (one-shot 5000 lctl)
+  va (one-shot 5000 lalt)
+  vm (one-shot 5000 lmet)
+)
+
 (defalias
   ;; ── Shifted symbols (SYM layer) ────────────────────────────────
   excl (multi lsft 1)         ;; !
@@ -65,6 +71,7 @@
   rcrl (multi lsft rbrc)      ;; }
   pipe (multi lsft bksl)      ;; |
   ques (multi lsft /)         ;; ?
+  colo (multi lsft ;)         ;; :
 
   ;; ── Oneshot modifiers (5s timeout) ─────────────────────────────
   os-s (one-shot 5000 lsft)
@@ -72,12 +79,14 @@
   os-a (one-shot 5000 lalt)
   os-m (one-shot 5000 lmet)
 
-  ;; NAV oneshot mods — also activate nav-escape while held so rolled
-  ;; keys hit the base layer instead of NAV (enables lmet→s→a = ctrl+a)
-  ns-s (multi (one-shot 5000 lsft) (layer-while-held nav-escape))
-  ns-c (multi (one-shot 5000 lctl) (layer-while-held nav-escape))
-  ns-a (multi (one-shot 5000 lalt) (layer-while-held nav-escape))
-  ns-m (multi (one-shot 5000 lmet) (layer-while-held nav-escape))
+  ;; NAV oneshot mods — use virtual keys so the oneshot survives NAV
+  ;; layer deactivation. on-press-fakekey press = held modifier while
+  ;; key is down; on-release-fakekey release = transitions to one-shot
+  ;; armed state when key is released. Also activates nav-escape so
+  ;; rolled keys hit the base layer instead of NAV.
+  ns-c (multi (on-press-fakekey vc press) (on-release-fakekey vc release) (layer-while-held nav-escape))
+  ns-a (multi (on-press-fakekey va press) (on-release-fakekey va release) (layer-while-held nav-escape))
+  ns-m (multi (on-press-fakekey vm press) (on-release-fakekey vm release) (layer-while-held nav-escape))
 
   ;; ── NAV layer shortcuts (macOS) ────────────────────────────────
   sw-w (multi lmet tab)              ;; ⌘⇥  app switch
@@ -136,7 +145,7 @@
   XX   brdn brup _    _    _    _    prev pp   next mute vold volu
   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX
   XX   q    w    e    r    t    y    u    i    o    p    XX   XX   XX
-  @sym a    s    d    f    g    h    j    k    l    ;    XX   XX
+  @sym a    s    d    f    g    h    j    k    l    '    XX   XX
   XX   z    x    c    v    b    n    m    ,    .    /    XX
   @fn-c XX  XX   @nav           spc            lsft XX
                                 XX   XX   XX   XX
@@ -160,14 +169,14 @@
 ;; ║                                                                         ║
 ;; ║  esc  [    {    (    ~       ^    )    }    ]    `                      ║
 ;; ║   -   *    =    _    $       #   ⌘¹   ⌥¹   ⌃¹   ⇧¹                   ║
-;; ║   +   |    @    /    %      spc   \    &    ?    !                     ║
+;; ║   +   |    @    /    %      spc   ;    &    ?    !                     ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 (deflayer callum-sym
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    esc  lbrc @lcrl @lprn @tild @cart @rprn @rcrl rbrc grv  _    _    _
-  _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @os-s _   _
-  _    @plus @pipe @at /    @pct  spc   bksl  @amp  @ques @excl _
+  _    esc  lbrc @lcrl @lprn @tild @cart @rprn @rcrl rbrc grv _    _    _
+  _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @colo _   _
+  _    @plus @pipe @at /   @pct spc  ;    @amp @ques @excl _
   _    _    _    @n-sr          _              _    _
                                 _    _    _    _
 )
@@ -183,9 +192,9 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    tab  @sw-w @tb-p @tb-n volu  XX   @cm-l up   @cm-r del  _    _    _
-  @n-ac @ns-s @ns-c @ns-a @ns-m vold caps left down right bspc _    _
+  @n-ac @os-s @ns-c @ns-a @ns-m vold left down up right bspc _    _
   _    @ds-p @ds-n @sp-b @sp-f pp   spc  pgdn  pgup @ct-s ret  _
-  _    _    _    _              _              _    _
+  _    _    _    _              @n-sr          _    _
                                 _    _    _    _
 )
 
@@ -199,7 +208,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    q    w    e    r    t    y    u    i    o    p    _    _    _
-  _    a    s    d    f    g    h    j    k    l    ;    _    _
+  _    a    s    d    f    g    h    j    k    l    '    _    _
   _    z    x    c    v    b    n    m    ,    .    /    _
   _    _    _    _              spc            _    _
                                 _    _    _    _
@@ -220,17 +229,13 @@
 
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
 ;; ║  CALLUM-NUM — numbers & F-keys (Callum's NUM layer)                    ║
-;; ║                                                                         ║
-;; ║   7    5    3    1    9       8    0    2    4    6                     ║
-;; ║  ⇧¹   ⌃¹   ⌥¹   ⌘¹  F11   F10   ⌘¹   ⌥¹   ⌃¹   ⇧¹                 ║
-;; ║  F7   F5   F3   F1   F9     F8   F12   F2   F4   F6                  ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 (deflayer callum-num
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    7    5    3    1    9    8    0    2    4    6    _    _    _
-  _    @os-s @os-c @os-a @os-m f11 f10  @os-m @os-a @os-c @os-s _    _
-  _    f7   f5   f3   f1   f9   f8   f12  f2   f4   f6   _
+  _    f1   f2   f3   f4   f5   f6   7    8    9    -    _    _    _
+  _    @os-s @os-c @os-a @os-m f7 f8 4    5    6    +    _    _
+  _    f9   f10  f11  f12  _    0    1    2    3    .    _
   _    _    _    _              _              _    _
                                 _    _    _    _
 )
