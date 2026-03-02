@@ -70,6 +70,7 @@
   pipe (multi lsft bksl)      ;; |
   ques (multi lsft /)         ;; ?
   colo (multi lsft ;)         ;; :
+  smcl (fork @colo (multi (release-key lsft) (release-key rsft) ;) (lsft rsft))  ;; : normally, ; when shifted
 
   ;; ── Oneshot modifiers (5s timeout) ─────────────────────────────
   os-s (one-shot 5000 lsft)
@@ -137,7 +138,7 @@
   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX   XX
   XX   q    w    e    r    t    y    u    i    o    p    XX   XX   XX
   XX   a    s    d    f    g    h    j    k    l    '    XX   XX
-  lsft z    x    c    v    b    n    m    ,    .    /    XX
+  @os-s z    x    c    v    b    n    m    ,    .    /    XX
   @fn-c XX  XX   @nav           spc            @sym XX
                                 XX   XX   XX   XX
 )
@@ -153,9 +154,9 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    esc  lbrc @lcrl @lprn @tild @cart @rprn @rcrl rbrc grv _    _    _
-  _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @colo _   _
+  _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @smcl _   _
   _    @plus @pipe @at /   @pct spc  ;    @amp @ques @excl _
-  _    _    _    @n-sr          @n-sr           _    _
+  _    _    _    bspc          @n-sr           _    _
                                 _    _    _    _
 )
 
@@ -170,8 +171,8 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    tab  @sw-w @tb-p @tb-n volu @cm-l @sp-b @sp-f @cm-r del  _    _    _
-  XX   @tmux-l @ns-c @ns-a @ns-m vold left down up right bspc _    _
-  _    @ct-n XX @sp-b @sp-f pp   @ds-p pgdn  pgup @ds-n ret  _
+  XX   @tmux-l @ns-c @ns-a @ns-m vold left down up right ret _    _
+  _    @ct-n XX @sp-b @sp-f pp   @ds-p pgdn  pgup @ds-n @ct-n  _
   _    _    _    _              @n-sr          bspc _
                                 _    _    _    _
 )
