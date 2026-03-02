@@ -64,7 +64,7 @@ endif
 set undolevels=1000 "maximum number of changes that can be undone
 
 " Color
-colorscheme vibrantink
+colorscheme base16-tomorrow-night
 
 augroup Drakefile
   au!
@@ -539,8 +539,8 @@ command! -nargs=0 Trim :call Trim()
 nnoremap <silent> <Leader>cw :Trim<CR>
 
 function! __Edge()
-  colorscheme Tomorrow-Night
-  au BufWinLeave * colorscheme Tomorrow-Night
+  colorscheme base16-tomorrow-night
+  au BufWinLeave * colorscheme base16-tomorrow-night
 
   set ttyfast
 

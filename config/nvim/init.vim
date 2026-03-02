@@ -4,13 +4,16 @@
 
 if has('nvim-0.5')
   lua << EOF
+  local lsp_config_available
+  local nvim_lsp
   if vim.fn.has('nvim-0.11') == 1 then
     -- Use new vim.lsp.config API for Neovim 0.11+
-    local lsp_config_available = true
+    lsp_config_available = true
   else
     -- Use legacy lspconfig for older versions
-    local status, nvim_lsp = pcall(require, 'lspconfig')
-    local lsp_config_available = status
+    local status, lsp = pcall(require, 'lspconfig')
+    lsp_config_available = status
+    nvim_lsp = lsp
   end
   if lsp_config_available then
     -- Run an LSP command using a Telescope picker if it's available, otherwise use the fallback.
@@ -21,7 +24,10 @@ if has('nvim-0.5')
       vim.schedule(function()
         local status, telescope = pcall(require, 'telescope.builtin')
         if status then
-          telescope[picker]{}
+          local ok = pcall(telescope[picker], {})
+          if not ok then
+            fallback()
+          end
         else
           fallback()
         end
@@ -60,6 +66,8 @@ if has('nvim-0.5')
       buf_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', opts)
       buf_set_keymap('n', 'gr', '<cmd>lua lsp_do("lsp_references", vim.lsp.buf.references)<CR>', opts)
       buf_set_keymap('n', '<Leader>ds', '<cmd>lua lsp_do("lsp_document_symbols", vim.lsp.buf.document_symbol)<CR>', opts)
+      buf_set_keymap('n', '<Leader>s', '<cmd>lua lsp_do("lsp_workspace_symbols", vim.lsp.buf.workspace_symbol)<CR>', opts)
+      buf_set_keymap('n', '<Leader>ws', '<cmd>lua lsp_do("lsp_workspace_symbols", vim.lsp.buf.workspace_symbol)<CR>', opts)
 
       -- Diagnostics
       buf_set_keymap('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>', opts)
@@ -77,14 +85,15 @@ if has('nvim-0.5')
       buf_set_keymap('n', '<Leader>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>', opts)
 
       -- Set some keybinds conditional on server capabilities
-      if client.resolved_capabilities.document_formatting then
-        buf_set_keymap("n", "<Leader>fd", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
-      elseif client.resolved_capabilities.document_range_formatting then
-        buf_set_keymap("n", "<Leader>fd", "<cmd>lua vim.lsp.buf.formatting()<CR>", opts)
+      local caps = client.server_capabilities or (client.resolved_capabilities or {})
+      if caps.documentFormattingProvider then
+        buf_set_keymap("n", "<Leader>fd", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+      elseif caps.documentRangeFormattingProvider then
+        buf_set_keymap("n", "<Leader>fd", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
       end
 
       -- Set autocommands conditional on server_capabilities
-      if client.resolved_capabilities.document_highlight then
+      if caps.documentHighlightProvider then
         vim.api.nvim_exec([[
           hi LspReferenceRead cterm=bold ctermbg=red guibg=LightYellow
           hi LspReferenceText cterm=bold ctermbg=red guibg=LightYellow
@@ -127,6 +136,14 @@ if has('nvim-0.5')
       }
       vim.lsp.enable('bashls')
 
+      vim.lsp.config.kotlin_lsp = {
+        cmd = { "kotlin-lsp", "--stdio" },
+        filetypes = { "kotlin" },
+        root_markers = { "build.gradle", "build.gradle.kts", "settings.gradle", "settings.gradle.kts" },
+        single_file_support = false,
+      }
+      vim.lsp.enable('kotlin_lsp')
+
       -- Set up on_attach for all LSP buffers
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
@@ -157,11 +174,29 @@ if has('nvim-0.5')
 
   local status, telescope = pcall(require, 'telescope')
   if status then
+    local actions = require('telescope.actions')
     telescope.setup{
+      defaults = {
+        path_display = { "truncate" },
+        mappings = {
+          i = {
+            ["<C-j>"] = actions.move_selection_next,
+            ["<C-k>"] = actions.move_selection_previous,
+          },
+        },
+      },
       pickers = {
         ['lsp_code_actions'] = {
           timeout = 30000
-        }
+        },
+        ['lsp_workspace_symbols'] = {
+          path_display = { "tail" },
+          layout_strategy = "vertical",
+          layout_config = {
+            preview_height = 0.55,
+            height = 0.8,
+          },
+        },
       }
     }
   end
