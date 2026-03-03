@@ -27,8 +27,14 @@
 ;;   From NAV → hold rmet or space
 
 (defcfg
-  process-unmapped-keys yes
-  concurrent-tap-hold   no
+  process-unmapped-keys   yes
+  concurrent-tap-hold     no
+  macos-dev-names-include (
+    "Apple Internal Keyboard / Trackpad"
+    "8BitDo Retro 18 Numpad"
+    "Keychron Link "
+    "TrackPoint Keyboard II"
+  )
 )
 
 ;; Function row included in defsrc and explicitly mapped to special-function
