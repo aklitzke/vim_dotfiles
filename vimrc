@@ -64,6 +64,7 @@ endif
 set undolevels=1000 "maximum number of changes that can be undone
 
 " Color
+set termguicolors
 colorscheme base16-tomorrow-night
 
 augroup Drakefile
