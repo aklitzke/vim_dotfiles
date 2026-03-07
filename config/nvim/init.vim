@@ -144,6 +144,13 @@ if has('nvim-0.5')
       }
       vim.lsp.enable('kotlin_lsp')
 
+      vim.lsp.config['beancount-language-server'] = {
+        cmd = { "beancount-language-server", "--stdio" },
+        filetypes = { "beancount" },
+        root_markers = {'main.beancount', 'main.bean', '.git'},
+      }
+      vim.lsp.enable('beancount-language-server')
+
       -- Set up on_attach for all LSP buffers
       vim.api.nvim_create_autocmd('LspAttach', {
         callback = function(args)
