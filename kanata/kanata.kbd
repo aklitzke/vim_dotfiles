@@ -32,7 +32,6 @@
   macos-dev-names-include (
     "Apple Internal Keyboard / Trackpad"
     "8BitDo Retro 18 Numpad"
-    "Keychron Link "
     "TrackPoint Keyboard II"
   )
 )
@@ -46,7 +45,7 @@
   tab  q    w    e    r    t    y    u    i    o    p    lbrc rbrc bksl
   caps a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-  fn   lctl lalt lmet           spc            rmet ralt
+  fn   lctl lalt lmet           spc            rmet ralt rctl
                                 left down up   right
 )
 
@@ -114,9 +113,11 @@
   ;; NUM from either SYM or NAV: hold the other thumb key
   n-sr (layer-while-held callum-num)
 
-  ;; ── fn toggle ──────────────────────────────────────────────────
-  fn-n (tap-dance 300 (fn  (layer-switch callum)))  ;; normal: tap=fn, dtap→callum
-  fn-c (tap-dance 300 (XX  (layer-switch normal)))  ;; callum: tap=XX, dtap→normal
+  ;; ── fn / rctl toggle ───────────────────────────────────────────
+  fn-n (tap-dance 300 (fn   (layer-switch callum)))  ;; normal: tap=fn, dtap→callum
+  fn-c (tap-dance 300 (XX   (layer-switch normal)))  ;; callum: tap=XX, dtap→normal
+  rc-n (tap-dance 300 (rctl (layer-switch callum)))  ;; normal: tap=rctl, dtap→callum
+  rc-c (tap-dance 300 (XX   (layer-switch normal)))  ;; callum: tap=XX, dtap→normal
 )
 
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -128,7 +129,7 @@
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _
-  @fn-n _   _    _              _              _    _
+  @fn-n _   _    _              _              _    _    @rc-n
                                 _    _    _    _
 )
 
@@ -145,24 +146,24 @@
   XX   q    w    e    r    t    y    u    i    o    p    XX   XX   XX
   XX   a    s    d    f    g    h    j    k    l    '    XX   XX
   @os-s z    x    c    v    b    n    m    ,    .    /    XX
-  @fn-c XX  XX   @nav           spc            @sym XX
+  @fn-c XX  XX   @nav           spc            @sym XX   @rc-c
                                 XX   XX   XX   XX
 )
 
 ;; ╔═══════════════════════════════════════════════════════════════════════════╗
 ;; ║  CALLUM-SYM — symbols (Callum's SYM layer)                             ║
 ;; ║                                                                         ║
-;; ║  esc  [    {    (    ~       ^    )    }    ]    `                      ║
-;; ║   -   *    =    _    $       #   ⌘¹   ⌥¹   ⌃¹   ⇧¹                   ║
-;; ║   +   |    @    /    %      spc   ;    &    ?    !                     ║
+;; ║  esc  [    {    (    ~       `    )    }    ]    +                      ║
+;; ║   @   $    -    /    |       \   ⌘¹   ⌥¹   ⌃¹   :                    ║
+;; ║   #   *    ^    _    &       !    =    %   spc   ×                    ║
 ;; ╚═══════════════════════════════════════════════════════════════════════════╝
 (deflayer callum-sym
   _    _    _    _    _    _    _    _    _    _    _    _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    esc  lbrc @lcrl @lprn @tild @cart @rprn @rcrl rbrc grv _    _    _
-  _    min  @star eql  @unds @dllr @hash @os-m @os-a @os-c @smcl _   _
-  _    @plus @pipe @at /   @pct spc  ;    @amp @ques @excl _
-  _    _    _    bspc          @n-sr           _    _
+  _    esc  lbrc @lcrl @lprn @tild grv  @rprn @rcrl rbrc @plus _    _    _
+  _    @at  @dllr min  /    @pipe bksl @os-m @os-a @os-c @smcl _   _
+  _    @hash @star @cart @unds @amp @excl eql  @pct spc  XX   _
+  _    _    _    bspc          @n-sr           _    _    _
                                 _    _    _    _
 )
 
@@ -179,7 +180,7 @@
   _    tab  @sw-w @tb-p @tb-n volu @cm-l @sp-b @sp-f @cm-r del  _    _    _
   XX   @tmux-l @ns-c @ns-a @ns-m vold left down up right ret _    _
   _    @ct-n XX @sp-b @sp-f pp   @ds-p pgdn  pgup @ds-n @ct-n  _
-  _    _    _    _              @n-sr          bspc _
+  _    _    _    _              @n-sr          bspc _    _
                                 _    _    _    _
 )
 
@@ -195,7 +196,7 @@
   _    q    w    e    r    t    y    u    i    o    p    _    _    _
   _    a    s    d    f    g    h    j    k    l    '    _    _
   _    z    x    c    v    b    n    m    ,    .    /    _
-  _    _    _    _              spc            _    _
+  _    _    _    _              spc            _    _    _
                                 _    _    _    _
 )
 
@@ -208,6 +209,6 @@
   _    f1   f2   f3   f4   f5   f6   7    8    9    del  _    _    _
   _    @os-s @os-c @os-a @os-m f7 f8 4    5    6    bspc _    _
   _    f9   f10  f11  f12  spc  0    1    2    3    .    _
-  _    _    _    _              _              _    _
+  _    _    _    _              _              _    _    _
                                 _    _    _    _
 )
