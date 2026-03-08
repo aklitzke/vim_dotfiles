@@ -31,8 +31,6 @@
   concurrent-tap-hold     no
   macos-dev-names-include (
     "Apple Internal Keyboard / Trackpad"
-    "8BitDo Retro 18 Numpad"
-    "TrackPoint Keyboard II"
   )
 )
 
